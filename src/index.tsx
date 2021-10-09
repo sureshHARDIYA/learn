@@ -1,12 +1,37 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {
+  BrowserRouter as Router,
+} from "react-router-dom";
+
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+} from "@apollo/client";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
 import './index.css';
-import App from './App';
+import App from './containers/App';
+import { ROOT_API } from './config/api';
 import reportWebVitals from './reportWebVitals';
+
+const client = new ApolloClient({
+  uri: ROOT_API,
+  cache: new InMemoryCache()
+});
+
+const lightTheme = createTheme({ palette: { mode: 'light' } });
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+      <ApolloProvider client={client}>
+      <ThemeProvider theme={lightTheme}>
+        <Router>
+            <App />
+          </Router>
+        </ThemeProvider>
+  </ApolloProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

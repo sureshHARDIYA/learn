@@ -1,0 +1,1 @@
+export const ROOT_API = "https://techquiz-production.herokuapp.com/api"

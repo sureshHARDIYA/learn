@@ -36,3 +36,25 @@
     transform: rotate(360deg);
   }
 }
+
+body {
+    padding: 24px;
+    background-color: rgb(234, 238, 243);
+}
+
+h1 {
+   font-size: 2.5rem;
+    line-height: 1.2222222222222223;
+    letter-spacing: 0;
+    font-weight: 800;
+    margin: 16px 0;
+    color: #0A1929;
+}
+
+.description {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  font-weight: 400;
+  margin: 0 0 40px;
+}
