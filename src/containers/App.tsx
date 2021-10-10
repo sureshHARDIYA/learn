@@ -10,6 +10,7 @@ import Category from './Categories';
 import CategoryDetailed from './CategoryDetailed'
 import QuizLanding from './QuizLanding';
 import Menu from '../components/Menu'
+import QuizTest from './QuizTest'
 
 
 function Home() {
@@ -26,6 +27,9 @@ function App() {
           </Route>
           <Route path="/categories">
             <Category />
+          </Route>
+          <Route path="/quiz/:id/test">
+            <QuizTest />
           </Route>
           <Route path="/quiz/:id">
             <QuizLanding />
