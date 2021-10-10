@@ -4,10 +4,10 @@ import { useParams } from "react-router";
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import { styled } from '@mui/material/styles';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 
+import styled from 'styled-components';
 
 import GET_SINGLE_QUESTIONNAIRE from "../graphql/getSingleQuiz";
 import { useState } from "react";
@@ -19,12 +19,21 @@ import { useState } from "react";
     display: 'flex',
     justifyContent: 'space-between',
     cursor: 'pointer',
-    width: '97%'
+    width: '97%',
   }));
+
+  const Item = styled(Item2)`
+  &:hover {
+    background: rgba(0,0,0,0.08);
+    color: black;
+  }
+  `
 
 const QuizTest = () => {
     const { id } = useParams<CategoryParams>()
     const [current, setCurrent] = useState(1)
+    const [selected, setSelected] = useState<AnswerType>([]);
+
     const { loading, error, data } = useQuery(GET_SINGLE_QUESTIONNAIRE, {
         variables: { id }
     });
@@ -42,7 +51,19 @@ const QuizTest = () => {
             setCurrent(current + 1)
         }
 
-        console.log('clicked', event)
+    }
+
+    const handleSelected = (questionId: string, answerId: string) => {
+        
+        const currentAnswer = {
+            [questionId]: answerId
+        }
+        if(selected?.indexOf(currentAnswer) !== -1) {
+            console.log("Already selected")
+        } else {
+            const newSelected = selected.push(currentAnswer)
+            console.log(setSelected, newSelected)
+        }
     }
 
     if (loading) return <p>Loading...</p>;
@@ -58,21 +79,19 @@ const QuizTest = () => {
         <Typography variant="body1" className="description" sx={{marginBottom: '3rem'}}>
             {currentQuestion.title}
         </Typography>
-        {console.log(quiz)}
     </Paper>
         <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} md={12}>
         <Stack spacing={2} justifyContent="center" alignItems="center">
             {currentQuestion && currentQuestion.answers.map((item: any) => 
-            <Item2 key={item.id}>
+            <Item key={item.id} onClick={() => handleSelected(currentQuestion.id, item.id)}>
                 {item.title}
-          </Item2> )   
+          </Item> )   
         }
           <Pagination count={questions.length} variant="outlined" shape="rounded" onChange={handlePageChange} page={current} 
           
           />
-          {console.log(current)}
           </Stack>
         </Grid>
       </Grid>
@@ -86,3 +105,7 @@ export default QuizTest
 type CategoryParams = {
     id: string;
 };
+
+interface StringMap { [key: string]: string; }
+
+type AnswerType = Array<StringMap>;

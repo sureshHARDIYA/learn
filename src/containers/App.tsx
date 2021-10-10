@@ -11,6 +11,8 @@ import CategoryDetailed from './CategoryDetailed'
 import QuizLanding from './QuizLanding';
 import Menu from '../components/Menu'
 import QuizTest from './QuizTest'
+import Login from './Login';
+import Contact from './Contact';
 
 
 function Home() {
@@ -33,6 +35,12 @@ function App() {
           </Route>
           <Route path="/quiz/:id">
             <QuizLanding />
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/contact">
+            <Contact />
           </Route>
           <Route path="/">
             <Home />
