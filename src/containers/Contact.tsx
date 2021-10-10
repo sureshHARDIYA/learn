@@ -1,10 +1,10 @@
-import Container from '@mui/material/Container';
+import Container from "@mui/material/Container";
 
 function Contact() {
   return (
     <Container>
-        <h2>Contact page ...</h2>
-     Under development
+      <h2>Contact page ...</h2>
+      Under development
     </Container>
   );
 }

@@ -1,13 +1,13 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import { Typography } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import Button from '@mui/material/Button';
+import Table from "@mui/material/Table";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import { Typography } from "@mui/material";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import TableHead from "@mui/material/TableHead";
+import TableContainer from "@mui/material/TableContainer";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 export default function QuizMeta(props: any) {
   return (
@@ -24,13 +24,10 @@ export default function QuizMeta(props: any) {
           {props.rows.map((row: any) => (
             <TableRow
               key={row.name}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                <Typography className="description">
-                {row.name}
-                </Typography>
+                <Typography className="description">{row.name}</Typography>
               </TableCell>
               <TableCell align="right">{row.views}</TableCell>
             </TableRow>
