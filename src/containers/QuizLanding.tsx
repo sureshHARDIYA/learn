@@ -43,15 +43,28 @@ const QuizLanding = () => {
         <Grid item xs={4}>
           <Item>
               <h4>Level: {quiz.level}</h4>
+              <h4>Author: {quiz.createdBy.firstName}</h4>
+              <h4>Cateogry: {quiz.category.name}</h4>
+              <h4>Created at: {quiz.createdAt}</h4>
+              <h4>Last updated at: {quiz.updatedAt}</h4>
+              <h4>Number of times played: 55</h4>
+              <h4>Total number of questions: {quiz.questions.length}</h4>
           </Item>
         </Grid>
         <Grid item xs={8}>
           <Item>
-            <Button variant="outlined" size="large">
-                TAKE TEST
-            </Button>
+          <InfoDiv>
+              You can practice questions. Answers will be shown immediately.
             <Button variant="outlined" size="large">
                  PRACTICE
+            </Button>
+          </InfoDiv>
+          </Item>
+          <p />
+          <Item>
+          TAKE TEST
+            <Button variant="outlined" size="large">
+            TAKE TEST
             </Button>
           </Item>
         </Grid>
@@ -66,3 +79,10 @@ export default QuizLanding
 type CategoryParams = {
     id: string;
 };
+
+
+const InfoDiv = styled("div")(({ theme }) => ({
+    ...theme.typography.body2,
+    padding: theme.spacing(2),
+    color: theme.palette.text.secondary,
+  }));

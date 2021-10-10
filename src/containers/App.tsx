@@ -9,6 +9,7 @@ import '../App.css';
 import Category from './Categories';
 import CategoryDetailed from './CategoryDetailed'
 import QuizLanding from './QuizLanding';
+import Menu from '../components/Menu'
 
 
 function Home() {
@@ -33,6 +34,7 @@ function App() {
             <Home />
           </Route>
         </Switch>
+        <Menu />
     </Container>
   );
 }
