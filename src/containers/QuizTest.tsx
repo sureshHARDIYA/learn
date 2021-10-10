@@ -1,38 +1,59 @@
+import { ReactElement, useState } from "react";
+import Box from "@mui/material/Box";
+import classnames from "classnames";
+import Grid from "@mui/material/Grid";
+import styled from "styled-components";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
 import { useQuery } from "@apollo/client";
 import { Typography } from "@mui/material";
-import { useParams } from "react-router";
-import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid";
+import { useParams } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
-import Stack from "@mui/material/Stack";
-
-import styled from "styled-components";
 
 import GET_SINGLE_QUESTIONNAIRE from "../graphql/getSingleQuiz";
-import { useState } from "react";
 
-const Item2 = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  padding: theme.spacing(2),
-  color: theme.palette.text.secondary,
-  display: "flex",
-  justifyContent: "space-between",
-  cursor: "pointer",
-  width: "97%",
-}));
+const Item = styled.div`
+  cursor: pointer;
+  width: 97%;
+  background: white;
+  padding: 1rem;
+  transition: all 0.3s ease-out;
+  box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%),
+    0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
 
-const Item = styled(Item2)`
   &:hover {
     background: rgba(0, 0, 0, 0.08);
     color: black;
+    transform: translate(5px);
+  }
+
+  &:focus {
+    background: green;
   }
 `;
+
+function RenderOptionButton(item: any): ReactElement {
+  const [isPressed, setIsPressed] = useState(false);
+  const handleSelected = () => {
+    setIsPressed(!isPressed);
+  };
+
+  return (
+    <Item
+      key={item.key}
+      onClick={handleSelected}
+      className={classnames({
+        "btn-pressed": isPressed,
+      })}
+    >
+      {item.title}
+    </Item>
+  );
+}
 
 const QuizTest = () => {
   const { id } = useParams<CategoryParams>();
   const [current, setCurrent] = useState(1);
-  const [selected, setSelected] = useState<AnswerType>([]);
 
   const { loading, error, data } = useQuery(GET_SINGLE_QUESTIONNAIRE, {
     variables: { id },
@@ -52,17 +73,6 @@ const QuizTest = () => {
     }
   };
 
-  const handleSelected = (questionId: string, answerId: string) => {
-    const currentAnswer = {
-      [questionId]: answerId,
-    };
-    if (selected?.indexOf(currentAnswer) !== -1) {
-      console.log("Already selected");
-    } else {
-      const newSelected = selected.push(currentAnswer);
-      console.log(setSelected, newSelected);
-    }
-  };
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
@@ -86,15 +96,9 @@ const QuizTest = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} md={12}>
             <Stack spacing={2} justifyContent="center" alignItems="center">
-              {currentQuestion &&
-                currentQuestion.answers.map((item: any) => (
-                  <Item
-                    key={item.id}
-                    onClick={() => handleSelected(currentQuestion.id, item.id)}
-                  >
-                    {item.title}
-                  </Item>
-                ))}
+              {currentQuestion?.answers.map((item: any) => (
+                <RenderOptionButton {...item} />
+              ))}
               <Pagination
                 count={questions.length}
                 variant="outlined"
@@ -116,8 +120,6 @@ type CategoryParams = {
   id: string;
 };
 
-interface StringMap {
-  [key: string]: string;
-}
-
-type AnswerType = Array<StringMap>;
+// interface StringMap {
+//   [key: string]: string;
+// }

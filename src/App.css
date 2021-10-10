@@ -58,3 +58,8 @@ h1 {
   font-weight: 400;
   margin: 0 0 40px;
 }
+
+.btn-pressed {
+  background-color: #a1d1ff !important;
+  color: black !important;
+}
