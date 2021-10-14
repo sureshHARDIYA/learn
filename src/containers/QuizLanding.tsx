@@ -31,6 +31,10 @@ const QuizLanding = () => {
     history.push(`${history.location.pathname}/test`);
   };
 
+  const handlePracticeClick = () => {
+    history.push(`${history.location.pathname}/practice`);
+  };
+
   const quiz = isSuccess && data;
 
   if (isLoading) return <p>Loading...</p>;
@@ -69,7 +73,11 @@ const QuizLanding = () => {
               <span>
                 You can practice questions. Answers will be shown immediately.
               </span>
-              <Button variant="outlined" size="large">
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={handlePracticeClick}
+              >
                 PRACTICE
               </Button>
             </Item2>

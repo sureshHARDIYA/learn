@@ -8,9 +8,9 @@ import { useParams } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import { Set, isSet } from "immutable";
 import ReactMarkdown from "react-markdown";
-import { Button } from "@mui/material";
-// import { useStateMachine } from "little-state-machine";
+import { Button, Alert } from "@mui/material";
 
+import Reveal from "../components/Reveal";
 import { useGetSingleQuiz } from "../graphql/getSingleQuiz";
 
 type MyState = {
@@ -18,39 +18,31 @@ type MyState = {
   selected?: string;
 };
 
-// function updateAction(state: any, payload: any) {
-//   console.log("state:", state);
-//   console.log("payload:", payload);
-//   return {
-//     ...state,
-//     response: state.response.push(payload),
-//   };
-// }
-
-const QuizTest = () => {
+const QuizPractice = () => {
   const { id } = useParams<CategoryParams>();
   const [current, setCurrent] = useState(1);
   const [isPressed, setIsPressed] = useState<any>(() => Set());
-  // const { actions, state } = useStateMachine({ updateAction });
   const [cq, setCq] = useState<string>();
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
 
   const { data, error, isLoading, isSuccess } = useGetSingleQuiz(id);
 
   const quiz = isSuccess && data;
   const questions = quiz && quiz.questions;
 
-  // const handlePageChange = (event: any) => {
-  //   const getCurrent = event.target.textContent;
-  //   if (getCurrent) {
-  //     setCurrent(parseInt(event.target.textContent, 10));
-  //   }
+  //   const handlePageChange = (event: any) => {
+  //     const getCurrent = event.target.textContent;
+  //     if (getCurrent) {
+  //       setCurrent(parseInt(event.target.textContent, 10));
+  //     }
 
-  //   if (!getCurrent && current !== questions.length) {
-  //     setCurrent(current + 1);
-  //   }
+  //     if (!getCurrent && current !== questions.length) {
+  //       setCurrent(current + 1);
+  //     }
 
-  //   setIsPressed(() => isPressed.clear());
-  // };
+  //     setIsPressed(() => isPressed.clear());
+  //   };
 
   const handleNext = (event: any) => {
     if (current !== questions.length) {
@@ -61,14 +53,13 @@ const QuizTest = () => {
       console.log("OKAY, SUMMARY COMING...");
     }
 
-    // if (cq) {
-    //   let response: Record<string, unknown> = {};
-    //   response[cq] = isPressed.toJS();
-
-    //   actions.updateAction(response);
-    // }
-    console.log(cq);
+    if (cq) {
+      let response: Record<string, unknown> = {};
+      response[cq] = isPressed.toJS();
+    }
     setIsPressed(() => isPressed.clear());
+    setShowAnswer(false);
+    setShowCorrectAnswer(false);
   };
 
   const handlePrev = (event: any) => {
@@ -76,12 +67,23 @@ const QuizTest = () => {
       setCurrent(current - 1);
     }
     setIsPressed(() => isPressed.clear());
+    setShowAnswer(false);
+    setShowCorrectAnswer(false);
   };
 
-  const handleSelect = (id: MyState, type: string, questionId: string) => {
+  const handleSelect = (
+    id: MyState,
+    type: string,
+    questionId: string,
+    isCorrect: string
+  ) => {
     if (type === "SINGLE") {
       const newSet = isPressed.clear();
       setIsPressed(newSet.add(id));
+      setShowAnswer(true);
+      if (isCorrect) {
+        setShowCorrectAnswer(true);
+      }
     }
     if (type === "MULTIPLE" && isSet(isPressed)) {
       setIsPressed(
@@ -89,6 +91,8 @@ const QuizTest = () => {
       );
     }
     setCq(questionId);
+
+    console.log(isCorrect);
   };
 
   if (isLoading) return <p>Loading...</p>;
@@ -97,7 +101,7 @@ const QuizTest = () => {
   const currentQuestion = quiz && quiz.questions[current - 1];
 
   return (
-    <>
+    <Reveal effect="fadeInDown">
       <Paper
         elevation={3}
         sx={{ padding: "3rem", marginBottom: "2rem", wordBreak: "break-all" }}
@@ -110,6 +114,18 @@ const QuizTest = () => {
           <ReactMarkdown>{currentQuestion.title}</ReactMarkdown>
         </div>
       </Paper>
+      <div>
+        {showAnswer && showCorrectAnswer && (
+          <Alert severity="success" sx={{ marginBottom: "1rem" }}>
+            {currentQuestion.explainAnswer}
+          </Alert>
+        )}
+        {showAnswer && !showCorrectAnswer && (
+          <Alert severity="warning" sx={{ marginBottom: "1rem" }}>
+            {currentQuestion.explainAnswer}, <strong>Practice More...</strong>
+          </Alert>
+        )}
+      </div>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={12}>
@@ -122,7 +138,8 @@ const QuizTest = () => {
                       handleSelect(
                         item.id,
                         currentQuestion.questionType,
-                        currentQuestion.id
+                        currentQuestion.id,
+                        item.isCorrect
                       )
                     }
                     className={
@@ -153,6 +170,7 @@ const QuizTest = () => {
                   variant="outlined"
                   shape="rounded"
                   // onChange={handlePageChange}
+                  disabled
                   page={current}
                 />
                 <Button variant="outlined" size="large" onClick={handleNext}>
@@ -163,11 +181,11 @@ const QuizTest = () => {
           </Grid>
         </Grid>
       </Box>
-    </>
+    </Reveal>
   );
 };
 
-export default QuizTest;
+export default QuizPractice;
 
 type CategoryParams = {
   id: string;

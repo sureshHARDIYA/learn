@@ -1,5 +1,6 @@
+import { Paper } from "@mui/material";
+import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
-import { Paper, Typography } from "@mui/material";
 
 import { useGetCategory } from "../graphql/getCategoryx";
 import QuestionnaireTable from "../components/quiz/QuestionnaireTable";
@@ -16,14 +17,9 @@ const CategoryDetailed = () => {
   return (
     <Paper elevation={3} sx={{ padding: "3rem" }}>
       <h1>{category.name}</h1>
-      <Typography
-        variant="body1"
-        className="description"
-        sx={{ marginBottom: "3rem" }}
-      >
-        {category.description}
-      </Typography>
-
+      <div className="description" style={{ marginBottom: "3rem" }}>
+        <ReactMarkdown>{category.description}</ReactMarkdown>
+      </div>
       <QuestionnaireTable rows={category.questionnaires} />
     </Paper>
   );
