@@ -1,31 +1,26 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 import "./index.css";
 import App from "./containers/App";
-import { ROOT_API } from "./config/api";
 import reportWebVitals from "./reportWebVitals";
-
-const client = new ApolloClient({
-  uri: ROOT_API,
-  cache: new InMemoryCache(),
-});
 
 const lightTheme = createTheme({ palette: { mode: "light" } });
 
+const queryClient = new QueryClient();
+
 ReactDOM.render(
-  <React.StrictMode>
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={lightTheme}>
-        <Router>
-          <App />
-        </Router>
-      </ThemeProvider>
-    </ApolloProvider>
-  </React.StrictMode>,
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider theme={lightTheme}>
+      <Router>
+        <App />
+      </Router>
+    </ThemeProvider>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>,
   document.getElementById("root")
 );
 

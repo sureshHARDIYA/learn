@@ -62,4 +62,11 @@ h1 {
 .btn-pressed {
   background-color: #a1d1ff !important;
   color: black !important;
+  border-left: 5px solid #64a1db;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.btn-clear {
+  background: white;
 }

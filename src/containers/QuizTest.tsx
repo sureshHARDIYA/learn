@@ -1,16 +1,15 @@
-import { ReactElement, useState } from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
-import classnames from "classnames";
 import Grid from "@mui/material/Grid";
 import styled from "styled-components";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import { useQuery } from "@apollo/client";
 import { Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
+import { Set, isSet } from "immutable";
 
-import GET_SINGLE_QUESTIONNAIRE from "../graphql/getSingleQuiz";
+import { useGetSingleQuiz } from "../graphql/getSingleQuiz";
 
 const Item = styled.div`
   cursor: pointer;
@@ -32,34 +31,19 @@ const Item = styled.div`
   }
 `;
 
-function RenderOptionButton(item: any): ReactElement {
-  const [isPressed, setIsPressed] = useState(false);
-  const handleSelected = () => {
-    setIsPressed(!isPressed);
-  };
-
-  return (
-    <Item
-      key={item.key}
-      onClick={handleSelected}
-      className={classnames({
-        "btn-pressed": isPressed,
-      })}
-    >
-      {item.title}
-    </Item>
-  );
-}
+type MyState = {
+  isPressed?: any;
+  selected?: string;
+};
 
 const QuizTest = () => {
   const { id } = useParams<CategoryParams>();
   const [current, setCurrent] = useState(1);
+  const [isPressed, setIsPressed] = useState<any>(Set());
 
-  const { loading, error, data } = useQuery(GET_SINGLE_QUESTIONNAIRE, {
-    variables: { id },
-  });
+  const { data, error, isLoading, isSuccess } = useGetSingleQuiz(id);
 
-  const quiz = data && data.questionnaireFind;
+  const quiz = isSuccess && data;
   const questions = quiz && quiz.questions;
 
   const handlePageChange = (event: any) => {
@@ -73,22 +57,34 @@ const QuizTest = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  const handleSelect = (id: MyState, type: string) => {
+    if (type === "SINGLE") {
+      const newSet = isPressed.clear();
+      setIsPressed(newSet.add(id));
+    }
+    if (type === "MULTIPLE" && isSet(isPressed)) {
+      setIsPressed(
+        isPressed.has(id) ? isPressed.remove(id) : isPressed.add(id)
+      );
+    }
+  };
+
+  if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
   const currentQuestion = quiz && quiz.questions[current - 1];
+
   return (
     <>
       <Paper
         elevation={3}
         sx={{ padding: "3rem", marginBottom: "2rem", wordBreak: "break-all" }}
       >
-        <h6>{quiz.name}</h6>
-        <Typography
-          variant="body1"
-          className="description"
-          sx={{ marginBottom: "3rem" }}
-        >
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <h6>{quiz.name}</h6>
+          <h6>{currentQuestion.questionType}</h6>
+        </Box>
+        <Typography variant="body1" className="description">
           {currentQuestion.title}
         </Typography>
       </Paper>
@@ -96,9 +92,20 @@ const QuizTest = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} md={12}>
             <Stack spacing={2} justifyContent="center" alignItems="center">
-              {currentQuestion?.answers.map((item: any) => (
-                <RenderOptionButton {...item} />
-              ))}
+              {currentQuestion &&
+                currentQuestion?.answers.map((item: any) => (
+                  <Item
+                    key={item.id}
+                    onClick={() =>
+                      handleSelect(item.id, currentQuestion.questionType)
+                    }
+                    className={
+                      isPressed.has(item.id) ? "btn-pressed" : "btn-clear"
+                    }
+                  >
+                    {item.title}
+                  </Item>
+                ))}
               <Pagination
                 count={questions.length}
                 variant="outlined"

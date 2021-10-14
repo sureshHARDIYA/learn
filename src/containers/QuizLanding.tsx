@@ -1,13 +1,12 @@
-import { useQuery } from "@apollo/client";
-import { Typography } from "@mui/material";
-import { useHistory, useParams } from "react-router-dom";
 import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { styled } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
+import { Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useHistory, useParams } from "react-router-dom";
 
-import GET_SINGLE_QUESTIONNAIRE from "../graphql/getSingleQuiz";
+import { useGetQuizMeta } from "../graphql/getSingleQuiz";
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -26,17 +25,15 @@ const Item2 = styled(Paper)(({ theme }) => ({
 const QuizLanding = () => {
   const { id } = useParams<CategoryParams>();
   const history = useHistory();
-  const { loading, error, data } = useQuery(GET_SINGLE_QUESTIONNAIRE, {
-    variables: { id },
-  });
+  const { data, error, isLoading, isSuccess } = useGetQuizMeta(id);
 
   const handleTestClick = () => {
     history.push(`${history.location.pathname}/test`);
   };
 
-  const quiz = data && data.questionnaireFind;
+  const quiz = isSuccess && data;
 
-  if (loading) return <p>Loading...</p>;
+  if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
   return (

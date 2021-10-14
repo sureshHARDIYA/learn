@@ -1,16 +1,15 @@
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import { useQuery } from "@apollo/client";
 
-import GET_CATEGORY from "../graphql/getCategories";
+import { useGetCategories } from "../graphql/getCategories";
 import CategoryViewCard from "../components/category/CategoryViewCard";
 
 function Categoryies() {
-  const { loading, error, data } = useQuery(GET_CATEGORY);
+  const { data, error, isLoading, isSuccess } = useGetCategories();
 
-  const rows = data && data.categoryList.rows;
+  const rows = isSuccess && data.rows;
 
-  if (loading) return <p>Loading...</p>;
+  if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
   return (

@@ -1,21 +1,27 @@
-import { gql } from "@apollo/client";
+import { useQuery } from "react-query";
+import {  gql } from "graphql-request";
 
-const GET_SINGLE_CATEGORY = gql`
-  query CATEGORY_FIND($id: String!) {
-    categoryFind(id: $id) {
-      id
-      name
-      description
-      questionnaires {
+import { graphQLClient } from '../config/api'
+
+export function useGetCategory(id: string) {
+  return useQuery(["get-category", id], async () => {
+    const { categoryFind } = await graphQLClient.request(gql`
+    query CATEGORY_FIND($id: String!) {
+      categoryFind(id: $id) {
         id
         name
         description
-        views
+        questionnaires {
+          id
+          name
+          description
+          views
+        }
+        createdAt
+        updatedAt
       }
-      createdAt
-      updatedAt
     }
-  }
-`;
-
-export default GET_SINGLE_CATEGORY
+    `, { id });
+    return categoryFind;
+  });
+}

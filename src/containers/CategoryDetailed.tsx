@@ -1,19 +1,16 @@
-import { useQuery } from "@apollo/client";
+import { useParams } from "react-router-dom";
 import { Paper, Typography } from "@mui/material";
-import { useParams } from "react-router";
 
-import GET_SINGLE_CATEGORY from "../graphql/getCategoryx";
+import { useGetCategory } from "../graphql/getCategoryx";
 import QuestionnaireTable from "../components/quiz/QuestionnaireTable";
 
 const CategoryDetailed = () => {
   const { categoryId } = useParams<CategoryParams>();
-  const { loading, error, data } = useQuery(GET_SINGLE_CATEGORY, {
-    variables: { id: categoryId },
-  });
+  const { data, error, isLoading, isSuccess } = useGetCategory(categoryId);
 
-  const category = data && data.categoryFind;
+  const category = isSuccess && data;
 
-  if (loading) return <p>Loading...</p>;
+  if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
   return (
