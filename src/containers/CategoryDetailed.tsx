@@ -1,11 +1,12 @@
 import { Paper } from "@mui/material";
+import styled from "styled-components";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
+import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 
 import { useGetCategory } from "../graphql/getCategoryx";
 import QuestionnaireTable from "../components/quiz/QuestionnaireTable";
-import styled from "styled-components";
 
 const CategoryDetailed = () => {
   const { categoryId } = useParams<CategoryParams>();
@@ -13,7 +14,8 @@ const CategoryDetailed = () => {
 
   const category = isSuccess && data;
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Skeleton variant="rectangular" height={500} />;
+
   if (error) return <p>Error :(</p>;
 
   return (

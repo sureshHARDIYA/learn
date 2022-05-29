@@ -4,6 +4,7 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import { Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import Skeleton from "@mui/material/Skeleton";
 import { useHistory, useParams } from "react-router-dom";
 
 import { useGetQuizMeta } from "../graphql/getSingleQuiz";
@@ -33,7 +34,7 @@ const QuizLanding = () => {
 
   const quiz = isSuccess && data;
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Skeleton variant="rectangular" height={500} />;
   if (error) return <p>Error :(</p>;
 
   return (

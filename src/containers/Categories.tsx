@@ -3,13 +3,15 @@ import Box from "@mui/material/Box";
 
 import { useGetCategories } from "../graphql/getCategories";
 import CategoryViewCard from "../components/category/CategoryViewCard";
+import CategoryLoading from "../components/category/CategoryLoading";
 
 function Categoryies() {
   const { data, error, isLoading, isSuccess } = useGetCategories();
 
   const rows = isSuccess && data.rows;
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <CategoryLoading />;
+
   if (error) return <p>Error :(</p>;
 
   return (

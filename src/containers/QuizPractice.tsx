@@ -9,6 +9,7 @@ import Stack from "@mui/material/Stack";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
 import { useReducer, useState } from "react";
+import Skeleton from "@mui/material/Skeleton";
 import Pagination from "@mui/material/Pagination";
 
 import Reveal from "../components/Reveal";
@@ -157,7 +158,8 @@ const QuizPractice = () => {
     }
   };
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Skeleton variant="rectangular" height={500} />;
+
   if (error) return <p>Error :(</p>;
 
   return (
