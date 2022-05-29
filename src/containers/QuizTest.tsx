@@ -61,13 +61,6 @@ const QuizTest = () => {
       console.log("OKAY, SUMMARY COMING...");
     }
 
-    // if (cq) {
-    //   let response: Record<string, unknown> = {};
-    //   response[cq] = isPressed.toJS();
-
-    //   actions.updateAction(response);
-    // }
-    console.log(cq);
     setIsPressed(() => isPressed.clear());
   };
 
@@ -173,13 +166,9 @@ type CategoryParams = {
   id: string;
 };
 
-// interface StringMap {
-//   [key: string]: string;
-// }
-
 const Item = styled.div`
   cursor: pointer;
-  width: 97%;
+  width: 100%;
   background: white;
   padding: 1rem;
   transition: all 0.3s ease-out;

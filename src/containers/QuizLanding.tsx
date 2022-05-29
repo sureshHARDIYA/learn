@@ -81,7 +81,7 @@ const QuizLanding = () => {
                 PRACTICE
               </Button>
             </Item2>
-            <p />
+            {/* <p />
             <Item2>
               <span>
                 You can take test. Answers will be shown when you finish test.
@@ -89,7 +89,7 @@ const QuizLanding = () => {
               <Button variant="outlined" size="large" onClick={handleTestClick}>
                 TAKE TEST
               </Button>
-            </Item2>
+            </Item2> */}
           </Grid>
         </Grid>
       </Box>

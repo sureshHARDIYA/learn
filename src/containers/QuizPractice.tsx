@@ -1,50 +1,89 @@
-import { useState } from "react";
+import { Set } from "immutable";
 import Box from "@mui/material/Box";
+import isEqual from "lodash/isEqual";
 import Grid from "@mui/material/Grid";
 import styled from "styled-components";
+import { Button } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import { useParams } from "react-router-dom";
-import Pagination from "@mui/material/Pagination";
-import { Set, isSet } from "immutable";
 import ReactMarkdown from "react-markdown";
-import { Button, Alert } from "@mui/material";
+import { useParams } from "react-router-dom";
+import { useReducer, useState } from "react";
+import Pagination from "@mui/material/Pagination";
 
 import Reveal from "../components/Reveal";
 import { useGetSingleQuiz } from "../graphql/getSingleQuiz";
+import ShowAnswerDailog, {
+  getSelectedAnswers,
+} from "../components/Dialog/ShowAnswerDialog";
 
-type MyState = {
-  isPressed?: any;
-  selected?: string;
+const practiceReducer = (state: any, action: any) => {
+  switch (action.type) {
+    case "ANSWER_SELECTED_SINGLE":
+      return {
+        ...state,
+        answersSelected: state.answersSelected.clear().add(action.payload),
+        checkAnswerButtonDisabled: false,
+      };
+
+    case "ANSWER_SELECTED_MULTIPLE":
+      return {
+        ...state,
+        answersSelected: state.answersSelected.add(action.payload),
+        checkAnswerButtonDisabled: false,
+      };
+
+    case "GOTO_NEXT_QUESTION":
+      return {
+        ...state,
+        answersSelected: state.answersSelected.clear(),
+        checkAnswerButtonDisabled: true,
+      };
+
+    case "CHECK_ANSWER_CLICKED":
+      /** Store in localstorage and make sure it is answered... */
+      return {
+        ...state,
+        checkAnswerButtonDisabled: true,
+        isAnwerSubmitted: true,
+        showAnswer: true,
+      };
+  }
+};
+
+const initialState = {
+  answersSelected: Set(),
+  showAnswer: false,
+  selectionDisabled: false,
+  checkAnswerButtonDisabled: true,
+  isAnswerSubmitted: false,
 };
 
 const QuizPractice = () => {
   const { id } = useParams<CategoryParams>();
   const [current, setCurrent] = useState(1);
-  const [isPressed, setIsPressed] = useState<any>(() => Set());
-  const [cq, setCq] = useState<string>();
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
+  const [playerStates, dispatch] = useReducer(practiceReducer, initialState);
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
 
   const { data, error, isLoading, isSuccess } = useGetSingleQuiz(id);
 
   const quiz = isSuccess && data;
   const questions = quiz && quiz.questions;
 
-  //   const handlePageChange = (event: any) => {
-  //     const getCurrent = event.target.textContent;
-  //     if (getCurrent) {
-  //       setCurrent(parseInt(event.target.textContent, 10));
-  //     }
+  const handlePageChange = (event: any) => {
+    const getCurrent = event.target.textContent;
+    if (getCurrent) {
+      setCurrent(parseInt(event.target.textContent, 10));
+    }
 
-  //     if (!getCurrent && current !== questions.length) {
-  //       setCurrent(current + 1);
-  //     }
-
-  //     setIsPressed(() => isPressed.clear());
-  //   };
+    if (!getCurrent && current !== questions.length) {
+      setCurrent(current + 1);
+    }
+  };
 
   const handleNext = (event: any) => {
+    dispatch({ type: "GOTO_NEXT_QUESTION", payload: undefined });
     if (current !== questions.length) {
       setCurrent(current + 1);
     }
@@ -52,53 +91,74 @@ const QuizPractice = () => {
     if (current === questions.length) {
       console.log("OKAY, SUMMARY COMING...");
     }
+  };
 
-    if (cq) {
-      let response: Record<string, unknown> = {};
-      response[cq] = isPressed.toJS();
+  const currentQuestion = quiz && quiz.questions[current - 1];
+
+  const handleCheckAnswer = () => {
+    const correctAnswer = currentQuestion.answers.filter(
+      (row: Record<string, unknown>) => row.isCorrect
+    );
+
+    setOpen(true);
+
+    if (playerStates.answersSelected.size) {
+      const selectedAnswers = playerStates.answersSelected.toJS();
+
+      /** IF QUESTION TYPE === SINGE */
+      if (currentQuestion.questionType === "SINGLE") {
+        const title = selectedAnswers.includes(correctAnswer[0].id)
+          ? "Correct"
+          : "Wrong";
+        setTitle(`${title} Answer selected`);
+      }
+
+      /** MULTIPLE ANSWERS */
+      if (currentQuestion.questionType === "MULTIPLE") {
+        const selected = getSelectedAnswers(
+          currentQuestion.answers,
+          playerStates.answersSelected.toJS()
+        );
+
+        const correctTitles = correctAnswer.flatMap(
+          (row: Record<string, unknown>) => row.title
+        );
+
+        const isAnswerCorrectly = isEqual(selected, correctTitles);
+
+        const title = isAnswerCorrectly ? "Correct" : "Wrong";
+        setTitle(`${title} Answer selected`);
+      }
     }
-    setIsPressed(() => isPressed.clear());
-    setShowAnswer(false);
-    setShowCorrectAnswer(false);
+
+    dispatch({ type: "CHECK_ANSWER_CLICKED", payload: undefined });
   };
 
   const handlePrev = (event: any) => {
     if (current !== 0) {
       setCurrent(current - 1);
     }
-    setIsPressed(() => isPressed.clear());
-    setShowAnswer(false);
-    setShowCorrectAnswer(false);
+    dispatch({ type: "GOTO_NEXT_QUESTION", payload: undefined });
   };
 
-  const handleSelect = (
-    id: MyState,
-    type: string,
-    questionId: string,
-    isCorrect: string
-  ) => {
-    if (type === "SINGLE") {
-      const newSet = isPressed.clear();
-      setIsPressed(newSet.add(id));
-      setShowAnswer(true);
-      if (isCorrect) {
-        setShowCorrectAnswer(true);
-      }
+  const handleGotToNext = () => {
+    dispatch({ type: "GOTO_NEXT_QUESTION", payload: undefined });
+    if (current !== questions.length) {
+      setCurrent(current + 1);
     }
-    if (type === "MULTIPLE" && isSet(isPressed)) {
-      setIsPressed(
-        isPressed.has(id) ? isPressed.remove(id) : isPressed.add(id)
-      );
-    }
-    setCq(questionId);
+  };
 
-    console.log(isCorrect);
+  const handleSelect = (id: string, type: string) => {
+    if (type === "SINGLE") {
+      dispatch({ type: "ANSWER_SELECTED_SINGLE", payload: id });
+    }
+    if (type === "MULTIPLE") {
+      dispatch({ type: "ANSWER_SELECTED_MULTIPLE", payload: id });
+    }
   };
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
-
-  const currentQuestion = quiz && quiz.questions[current - 1];
 
   return (
     <Reveal effect="fadeInDown">
@@ -107,25 +167,18 @@ const QuizPractice = () => {
         sx={{ padding: "3rem", marginBottom: "2rem", wordBreak: "break-all" }}
       >
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <h6>{quiz.name}</h6>
-          <h6>{currentQuestion.questionType}</h6>
+          <h6>
+            <StyledHeading>CATEGORY:</StyledHeading> {quiz.name}
+          </h6>
+          <h6>
+            <StyledHeading>Type:</StyledHeading>
+            {currentQuestion.questionType}
+          </h6>
         </Box>
         <div className="description">
           <ReactMarkdown>{currentQuestion.title}</ReactMarkdown>
         </div>
       </Paper>
-      <div>
-        {showAnswer && showCorrectAnswer && (
-          <Alert severity="success" sx={{ marginBottom: "1rem" }}>
-            {currentQuestion.explainAnswer}
-          </Alert>
-        )}
-        {showAnswer && !showCorrectAnswer && (
-          <Alert severity="warning" sx={{ marginBottom: "1rem" }}>
-            {currentQuestion.explainAnswer}, <strong>Practice More...</strong>
-          </Alert>
-        )}
-      </div>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={12}>
@@ -135,15 +188,12 @@ const QuizPractice = () => {
                   <Item
                     key={item.id}
                     onClick={() =>
-                      handleSelect(
-                        item.id,
-                        currentQuestion.questionType,
-                        currentQuestion.id,
-                        item.isCorrect
-                      )
+                      handleSelect(item.id, currentQuestion.questionType)
                     }
                     className={
-                      isPressed.has(item.id) ? "btn-pressed" : "btn-clear"
+                      playerStates.answersSelected.has(item.id)
+                        ? "btn-pressed"
+                        : "btn-clear"
                     }
                   >
                     {item.title}
@@ -165,22 +215,44 @@ const QuizPractice = () => {
                 >
                   Previous
                 </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={handleNext}
+                  // disabled={playerStates.checkAnswerButtonDisabled}
+                >
+                  Next
+                </Button>
                 <Pagination
                   count={questions.length}
                   variant="outlined"
                   shape="rounded"
-                  // onChange={handlePageChange}
+                  onChange={handlePageChange}
                   disabled
                   page={current}
                 />
-                <Button variant="outlined" size="large" onClick={handleNext}>
-                  {current === questions.length ? "Submit" : "Next"}
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={handleCheckAnswer}
+                  disabled={playerStates.checkAnswerButtonDisabled}
+                >
+                  Check Answer
                 </Button>
               </Box>
             </Stack>
           </Grid>
         </Grid>
       </Box>
+      <ShowAnswerDailog
+        title={title}
+        message={currentQuestion.explainAnswer}
+        open={open}
+        setOpen={setOpen}
+        selectedAnswers={playerStates.answersSelected}
+        correctAnswers={currentQuestion.answers}
+        handleGotToNext={handleGotToNext}
+      />
     </Reveal>
   );
 };
@@ -191,26 +263,29 @@ type CategoryParams = {
   id: string;
 };
 
-// interface StringMap {
-//   [key: string]: string;
-// }
-
-const Item = styled.div`
+const Item = styled.button`
   cursor: pointer;
-  width: 97%;
+  width: 100%;
   background: white;
   padding: 1rem;
   transition: all 0.3s ease-out;
   box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%),
     0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
+  border: 0px;
+  text-align: left;
+  font-size: 1.2rem;
 
   &:hover {
     background: rgba(0, 0, 0, 0.08);
     color: black;
-    transform: translate(5px);
   }
 
   &:focus {
     background: green;
   }
+`;
+
+export const StyledHeading = styled.span`
+  text-decoration: underline;
+  margin-right: 10px;
 `;

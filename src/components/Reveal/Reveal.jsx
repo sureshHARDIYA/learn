@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import ReactReveal from "react-reveal/Reveal";
 import "./Reveal.styles.css";
