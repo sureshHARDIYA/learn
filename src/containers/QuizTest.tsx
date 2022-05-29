@@ -31,8 +31,6 @@ const QuizTest = () => {
   const { id } = useParams<CategoryParams>();
   const [current, setCurrent] = useState(1);
   const [isPressed, setIsPressed] = useState<any>(() => Set());
-  // const { actions, state } = useStateMachine({ updateAction });
-  const [cq, setCq] = useState<string>();
 
   const { data, error, isLoading, isSuccess } = useGetSingleQuiz(id);
 
@@ -81,7 +79,7 @@ const QuizTest = () => {
         isPressed.has(id) ? isPressed.remove(id) : isPressed.add(id)
       );
     }
-    setCq(questionId);
+    // setCq(questionId);
   };
 
   if (isLoading) return <p>Loading...</p>;

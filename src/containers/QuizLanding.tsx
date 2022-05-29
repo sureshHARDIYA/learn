@@ -27,10 +27,6 @@ const QuizLanding = () => {
   const history = useHistory();
   const { data, error, isLoading, isSuccess } = useGetQuizMeta(id);
 
-  const handleTestClick = () => {
-    history.push(`${history.location.pathname}/test`);
-  };
-
   const handlePracticeClick = () => {
     history.push(`${history.location.pathname}/practice`);
   };
