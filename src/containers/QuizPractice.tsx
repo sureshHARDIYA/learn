@@ -8,7 +8,6 @@ import { Button } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import ReactMarkdown from "react-markdown";
-import Divider from "@mui/material/Divider";
 import { useParams } from "react-router-dom";
 import { useReducer, useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
@@ -152,12 +151,7 @@ const QuizPractice = () => {
             <h6>
               <StyledHeading>CATEGORY:</StyledHeading> {quiz.name}
             </h6>
-            <Divider
-              light
-              orientation="vertical"
-              flexItem
-              sx={{ marginRight: "10px" }}
-            />
+            <span style={{ marginRight: "10px" }} />
             <h6>
               <StyledHeading>TYPE:</StyledHeading>
               {currentQuestion.questionType}
