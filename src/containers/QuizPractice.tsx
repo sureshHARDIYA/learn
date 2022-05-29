@@ -207,22 +207,30 @@ const QuizPractice = () => {
                   width: "100%",
                 }}
               >
-                <Button
-                  variant="outlined"
-                  size="large"
-                  disabled={current - 1 === 0}
-                  onClick={handlePrev}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                  }}
                 >
-                  Previous
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={handleNext}
-                  // disabled={playerStates.checkAnswerButtonDisabled}
-                >
-                  Next
-                </Button>
+                  <Button
+                    variant="text"
+                    size="large"
+                    disabled={current - 1 === 0}
+                    onClick={handlePrev}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={handleNext}
+                    // disabled={playerStates.checkAnswerButtonDisabled}
+                  >
+                    Next
+                  </Button>
+                </Box>
                 <Pagination
                   count={questions.length}
                   variant="outlined"
