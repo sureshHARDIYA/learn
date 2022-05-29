@@ -8,49 +8,18 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import Pagination from "@mui/material/Pagination";
+import Divider from "@mui/material/Divider";
+import Tada from "react-reveal/Tada";
 
 import Reveal from "../components/Reveal";
-import { useGetSingleQuiz } from "../graphql/getSingleQuiz";
 import ShowAnswerDailog, {
   getSelectedAnswers,
 } from "../components/Dialog/ShowAnswerDialog";
-
-const practiceReducer = (state: any, action: any) => {
-  switch (action.type) {
-    case "ANSWER_SELECTED_SINGLE":
-      return {
-        ...state,
-        answersSelected: state.answersSelected.clear().add(action.payload),
-        checkAnswerButtonDisabled: false,
-      };
-
-    case "ANSWER_SELECTED_MULTIPLE":
-      return {
-        ...state,
-        answersSelected: state.answersSelected.add(action.payload),
-        checkAnswerButtonDisabled: false,
-      };
-
-    case "GOTO_NEXT_QUESTION":
-      return {
-        ...state,
-        answersSelected: state.answersSelected.clear(),
-        checkAnswerButtonDisabled: true,
-      };
-
-    case "CHECK_ANSWER_CLICKED":
-      /** Store in localstorage and make sure it is answered... */
-      return {
-        ...state,
-        checkAnswerButtonDisabled: true,
-        isAnwerSubmitted: true,
-        showAnswer: true,
-      };
-  }
-};
+import { useGetSingleQuiz } from "../graphql/getSingleQuiz";
+import { practiceReducer } from "./reducers/practiceReducer";
 
 const initialState = {
   answersSelected: Set(),
@@ -66,11 +35,30 @@ const QuizPractice = () => {
   const [playerStates, dispatch] = useReducer(practiceReducer, initialState);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
+  const [totalPossibleScore, setTotalScore] = useState(0);
+  const [scored, setScored] = useState(0);
 
   const { data, error, isLoading, isSuccess } = useGetSingleQuiz(id);
 
   const quiz = isSuccess && data;
   const questions = quiz && quiz.questions;
+
+  useEffect(() => {
+    if (quiz) {
+      const total =
+        quiz &&
+        quiz.questions.reduce((acc: any, curr: any) => {
+          const score = curr.answers
+            .filter((row: any) => row.isCorrect)
+            .reduce((acc: any, curr: any) => {
+              return acc + curr.score;
+            }, 0);
+
+          return acc + score;
+        }, 0);
+      setTotalScore(total);
+    }
+  }, [quiz]);
 
   const handlePageChange = (event: any) => {
     const getCurrent = event.target.textContent;
@@ -83,7 +71,7 @@ const QuizPractice = () => {
     }
   };
 
-  const handleNext = (event: any) => {
+  const handleNext = () => {
     dispatch({ type: "GOTO_NEXT_QUESTION", payload: undefined });
     if (current !== questions.length) {
       setCurrent(current + 1);
@@ -108,10 +96,14 @@ const QuizPractice = () => {
 
       /** IF QUESTION TYPE === SINGE */
       if (currentQuestion.questionType === "SINGLE") {
-        const title = selectedAnswers.includes(correctAnswer[0].id)
+        const getTitle = selectedAnswers.includes(correctAnswer[0].id)
           ? "Correct"
           : "Wrong";
-        setTitle(`${title} Answer selected`);
+        setTitle(`${getTitle} Answer selected`);
+
+        if (getTitle === "Correct") {
+          setScored((scored) => scored + 1);
+        }
       }
 
       /** MULTIPLE ANSWERS */
@@ -127,15 +119,18 @@ const QuizPractice = () => {
 
         const isAnswerCorrectly = isEqual(selected, correctTitles);
 
-        const title = isAnswerCorrectly ? "Correct" : "Wrong";
-        setTitle(`${title} Answer selected`);
+        const getTitle = isAnswerCorrectly ? "Correct" : "Wrong";
+        setTitle(`${getTitle} Answer selected`);
+        if (getTitle === "Correct") {
+          setScored((scored) => scored + 1);
+        }
       }
     }
 
     dispatch({ type: "CHECK_ANSWER_CLICKED", payload: undefined });
   };
 
-  const handlePrev = (event: any) => {
+  const handlePrev = () => {
     if (current !== 0) {
       setCurrent(current - 1);
     }
@@ -162,20 +157,36 @@ const QuizPractice = () => {
 
   if (error) return <p>Error :(</p>;
 
+  const totalQuestions = (questions && questions.length) ?? 0;
+
   return (
     <Reveal effect="fadeInDown">
       <Paper
         elevation={3}
-        sx={{ padding: "3rem", marginBottom: "2rem", wordBreak: "break-all" }}
+        sx={{ padding: "1.5rem", marginBottom: "2rem", wordBreak: "break-all" }}
       >
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <h6>
-            <StyledHeading>CATEGORY:</StyledHeading> {quiz.name}
-          </h6>
-          <h6>
-            <StyledHeading>Type:</StyledHeading>
-            {currentQuestion.questionType}
-          </h6>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <h6>
+              <StyledHeading>CATEGORY:</StyledHeading> {quiz.name}
+            </h6>
+            <Divider
+              light
+              orientation="vertical"
+              flexItem
+              sx={{ marginRight: "10px" }}
+            />
+            <h6>
+              <StyledHeading>TYPE:</StyledHeading>
+              {currentQuestion.questionType}
+            </h6>
+          </Box>
+          <Box sx={{ display: "flex" }}>
+            <Tada>
+              <StyledHeading>SCORE:</StyledHeading>
+              {scored}/{totalQuestions}
+            </Tada>
+          </Box>
         </Box>
         <div className="description">
           <ReactMarkdown>{currentQuestion.title}</ReactMarkdown>

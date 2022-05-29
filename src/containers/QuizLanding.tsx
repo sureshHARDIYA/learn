@@ -57,7 +57,9 @@ const QuizLanding = () => {
           <Grid item xs={12} md={4}>
             <Item>
               <h4>Level: {quiz.level}</h4>
-              <h4>Author: {quiz.createdBy.firstName}</h4>
+              <h4>
+                Author: {quiz.createdBy?.firstName ?? "Suresh Kumar Mukhiya"}
+              </h4>
               <h4>Cateogry: {quiz.category.name}</h4>
               <h4>Created at: {quiz.createdAt}</h4>
               <h4>Last updated at: {quiz.updatedAt}</h4>
