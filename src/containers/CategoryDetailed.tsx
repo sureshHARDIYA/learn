@@ -1,4 +1,5 @@
-import { Paper } from "@mui/material";
+import AdSense from "react-adsense";
+import { Paper, Box } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
 
@@ -21,6 +22,15 @@ const CategoryDetailed = () => {
         <ReactMarkdown>{category.description}</ReactMarkdown>
       </div>
       <QuestionnaireTable rows={category.questionnaires} />
+      <Box>
+        <AdSense.Google
+          client="ca-pub-0061264678585687"
+          slot="9429388490"
+          style={{ display: "block" }}
+          layout="in-article"
+          format="fluid"
+        />
+      </Box>
     </Paper>
   );
 };

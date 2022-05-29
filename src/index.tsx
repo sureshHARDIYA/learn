@@ -1,8 +1,8 @@
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import "./index.css";
 import App from "./containers/App";
