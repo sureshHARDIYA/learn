@@ -1,9 +1,11 @@
 import { Paper } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
+import Typography from "@mui/material/Typography";
 
 import { useGetCategory } from "../graphql/getCategoryx";
 import QuestionnaireTable from "../components/quiz/QuestionnaireTable";
+import styled from "styled-components";
 
 const CategoryDetailed = () => {
   const { categoryId } = useParams<CategoryParams>();
@@ -16,7 +18,7 @@ const CategoryDetailed = () => {
 
   return (
     <Paper elevation={3} sx={{ padding: "3rem" }}>
-      <h1>{category.name}</h1>
+      <StyledCategoryTitled variant="h1">{category.name}</StyledCategoryTitled>
       <div className="description" style={{ marginBottom: "3rem" }}>
         <ReactMarkdown>{category.description}</ReactMarkdown>
       </div>
@@ -30,3 +32,13 @@ export default CategoryDetailed;
 type CategoryParams = {
   categoryId: string;
 };
+
+const StyledCategoryTitled = styled(Typography)`
+  word-break: break-word;
+  font-size: 2.5rem;
+  line-height: 1.2222222222222223;
+  letter-spacing: 0;
+  font-weight: 800;
+  margin: 16px 0;
+  color: #0a1929;
+`;
