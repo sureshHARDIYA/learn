@@ -22,7 +22,7 @@ export default function CategoryViewCard(props: any): JSX.Element {
   }
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card>
       <CardActionArea onClick={() => handleClick(props.id)}>
         <CardHeader
           avatar={
