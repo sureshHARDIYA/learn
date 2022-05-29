@@ -1,4 +1,5 @@
 import Card from "@mui/material/Card";
+import parseISO from "date-fns/parseISO";
 import Avatar from "@mui/material/Avatar";
 import { red } from "@mui/material/colors";
 import { useHistory } from "react-router-dom";
@@ -31,7 +32,7 @@ export default function CategoryViewCard(props: any): JSX.Element {
             </Avatar>
           }
           title={props.title}
-          subheader={props.createdAt}
+          subheader={parseISO(props.createdAt).toDateString()}
         />
         <CardMedia
           component="img"

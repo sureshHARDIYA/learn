@@ -1,18 +1,18 @@
 import { Set } from "immutable";
 import Box from "@mui/material/Box";
 import isEqual from "lodash/isEqual";
+import Tada from "react-reveal/Tada";
 import Grid from "@mui/material/Grid";
 import styled from "styled-components";
 import { Button } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import ReactMarkdown from "react-markdown";
+import Divider from "@mui/material/Divider";
 import { useParams } from "react-router-dom";
-import { useEffect, useReducer, useState } from "react";
+import { useReducer, useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import Pagination from "@mui/material/Pagination";
-import Divider from "@mui/material/Divider";
-import Tada from "react-reveal/Tada";
 
 import Reveal from "../components/Reveal";
 import ShowAnswerDailog, {
@@ -35,30 +35,12 @@ const QuizPractice = () => {
   const [playerStates, dispatch] = useReducer(practiceReducer, initialState);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [totalPossibleScore, setTotalScore] = useState(0);
   const [scored, setScored] = useState(0);
 
   const { data, error, isLoading, isSuccess } = useGetSingleQuiz(id);
 
   const quiz = isSuccess && data;
   const questions = quiz && quiz.questions;
-
-  useEffect(() => {
-    if (quiz) {
-      const total =
-        quiz &&
-        quiz.questions.reduce((acc: any, curr: any) => {
-          const score = curr.answers
-            .filter((row: any) => row.isCorrect)
-            .reduce((acc: any, curr: any) => {
-              return acc + curr.score;
-            }, 0);
-
-          return acc + score;
-        }, 0);
-      setTotalScore(total);
-    }
-  }, [quiz]);
 
   const handlePageChange = (event: any) => {
     const getCurrent = event.target.textContent;

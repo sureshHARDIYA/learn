@@ -1,5 +1,11 @@
-import { Switch, Route, Link, useHistory } from "react-router-dom";
+import AppBar from "@mui/material/AppBar";
+import Button from "@mui/material/Button";
+import Toolbar from "@mui/material/Toolbar";
+import HomeIcon from "@mui/icons-material/Home";
 import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import { Switch, Route, Link, useHistory } from "react-router-dom";
 
 import "../App.css";
 import Login from "./Login";
@@ -10,13 +16,6 @@ import Menu from "../components/Menu";
 import QuizLanding from "./QuizLanding";
 import QuizPractice from "./QuizPractice";
 import CategoryDetailed from "./CategoryDetailed";
-
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 
 function App() {
   const history = useHistory();
@@ -36,7 +35,7 @@ function App() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <MenuIcon />
+            <HomeIcon />
           </IconButton>
           <Typography
             variant="h6"

@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
+import parseISO from "date-fns/parseISO";
 import Button from "@mui/material/Button";
 import { Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -61,8 +62,10 @@ const QuizLanding = () => {
                 Author: {quiz.createdBy?.firstName ?? "Suresh Kumar Mukhiya"}
               </h4>
               <h4>Cateogry: {quiz.category.name}</h4>
-              <h4>Created at: {quiz.createdAt}</h4>
-              <h4>Last updated at: {quiz.updatedAt}</h4>
+              <h4>Created at: {parseISO(quiz.createdAt).toDateString()}</h4>
+              <h4>
+                Last updated at: {parseISO(quiz.updatedAt).toDateString()}
+              </h4>
               <h4>Number of times played: 55</h4>
               <h4>Total number of questions: {quiz.questions.length}</h4>
             </Item>
